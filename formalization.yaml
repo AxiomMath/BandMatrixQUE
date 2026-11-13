@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Quantum unique ergodicity and the critical crossover for 1-d Gaussian band matrices"
+  description: >-
+    A Lean formalization of Theorems 1.1, 1.3 and 1.4 of Quantum unique ergodicity and the critical crossover for
+    1-d Gaussian band matrices: quantum unique ergodicity for bulk eigenvectors at every deterministic rank when
+    W^2/N tends to infinity; the unique critical joint law of the rescaled bulk eigenvalues and the block-mass
+    profiles of their eigenvectors when N/W^2 tends to tau in (0, infinity); and the strictly positive profile
+    variance of that law, with sine and Poisson limits as tau tends to 0 and to infinity. A companion theorem
+    formalizes the last sentence of Theorem 1.3: the critical law is determined by the construction of a random
+    entire function. This repository contains the substantive Lean development, including its Challenge and
+    Solution.
+  authors: ["Promit Ghosal", "Guillaume Remy"]
+  responsible_maintainers: ["Guillaume Remy"]
+  license: "Apache-2.0"
+  affiliations:
+    - name: "Promit Ghosal"
+      institution: "University of Chicago"
+    - name: "Guillaume Remy"
+      institution: "Axiom Math"
+
+repository:
+  role: "substantive-development"
+
+sources:
+  - title: "Quantum unique ergodicity and the critical crossover for 1-d Gaussian band matrices"
+    authors: ["Promit Ghosal", "Guillaume Remy"]
+    id: "https://arxiv.org/abs/2611.15085"
+    type: "paper"
+    relationship: "formalizes"
+    location: "Theorems 1.1, 1.3 and 1.4"
+    note: >-
+      The results were obtained through a human–AI collaboration: the investigators, Promit Ghosal and Guillaume
+      Remy, directed the research and made the mathematical judgments. AxiomProver generated the Lean
+      formalization. The work was developed at Axiom Math. The paper's appendix (AxiomProver Lean certificate and
+      AI declaration) describes this collaboration.
+
+related_formalizations:
+  - id: "https://github.com/leanprover-community/mathlib4"
+    relationship: "builds-on"
+    note: "Pinned in lake-manifest.json."
+  - id: "https://github.com/TauCetiProject/TauCeti"
+    relationship: "builds-on"
+    note: >-
+      Sorted eigenvalues and the Courant–Fischer theorem are copied from revision
+      720bf8c135bd2c354a15d55a73f2fc2c3d7aa358 (Apache-2.0); the original copyright notices are retained in the
+      source files and listed in NOTICE.
+
+classification:
+  arxiv: ["math.PR", "math-ph", "math.SP"]
+
+status:
+  scope: >-
+    The three Challenge statements are proved in Solution/BlockBandSolution.lean, with statements identical to the
+    Challenge and only the axioms propext, Classical.choice and Quot.sound. The companion theorem
+    BlockBand.critical_construction formalizes the last sentence of Theorem 1.3; it is not a Challenge statement,
+    so the comparator does not check it. The full default build passes for the library, the Challenge and the
+    Solution. The sorry counts below exclude the intentional Challenge placeholders.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Quot.sound", "Classical.choice"]
+  main_results:
+    - declaration: "BlockBand.que"
+      file: "Solution/BlockBandSolution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound", "Classical.choice"]
+      comparator_config: "comparator.json"
+    - declaration: "BlockBand.critical"
+      file: "Solution/BlockBandSolution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound", "Classical.choice"]
+      comparator_config: "comparator.json"
+    - declaration: "BlockBand.endpoints"
+      file: "Solution/BlockBandSolution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound", "Classical.choice"]
+      comparator_config: "comparator.json"
+    - declaration: "BlockBand.critical_construction"
+      file: "Solution/BlockBandSolution.lean"
+      sorry_count: 0
+      axioms: ["propext", "Quot.sound", "Classical.choice"]
+
+automation:
+  methods:
+    - method: "agent"
+      framework: "AxiomProver"
+      tool_setup: >-
+        AxiomProver generated the Lean formalization under the direction of the investigators.
+
+review:
+  status: "agent-reviewed"
+  notes: >-
+    The full default build, an axiom audit and the Lean comparator (statements matched against the Challenge, with
+    a replay of the whole environment in Lean's kernel) cover the three Challenge theorems. The Challenge
+    statements were compared with Theorems 1.1, 1.3 and 1.4 of the paper in an independent agent review. This
+    does not establish line-by-line correspondence between the informal and formal proofs.

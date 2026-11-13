@@ -1,0 +1,15 @@
+Quantum Unique Ergodicity and the Critical Crossover for Band Matrices in Lean 4
+Copyright 2026 Axiom Math
+
+This repository is made available under the Apache License, Version 2.0 (see LICENSE).
+
+The files BlockBand/Model/Construction/OrderedBasisSpan.lean, OrderedCourantFischer.lean,
+OrderedEigenvalues.lean, OrderedEntrywiseOpNorm.lean, OrderedPiL2.lean and OrderedSubmodule.lean, and the three
+files BlockBand/{Coarea/Native,Native/CEH,Native/PSSS}/Shared/Upstream/SpectralOrdered.lean, contain code copied
+from Tau Ceti (https://github.com/TauCetiProject/TauCeti) at revision
+720bf8c135bd2c354a15d55a73f2fc2c3d7aa358, distributed under the Apache License, Version 2.0. Some of these files
+are Copyright 2026 Kitware, Inc. (originating in https://github.com/AIQ-Kitware/aiq-dkps-formalization), and the
+others Copyright 2026 The Tau Ceti contributors, as stated in their headers.
+
+Mathlib is Copyright (c) its respective authors and is distributed under the Apache License, Version 2.0. It is
+fetched as a pinned build dependency rather than redistributed here.

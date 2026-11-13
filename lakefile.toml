@@ -1,0 +1,25 @@
+name = "BandMatrixQUE"
+version = "1.0.0"
+defaultTargets = ["BlockBand", "BlockBandChallenge", "BlockBandSolution"]
+
+[leanOptions]
+autoImplicit = false
+relaxedAutoImplicit = false
+warningAsError = true
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "3b531c35df33d6bbe64b4e87dec056211d3a5676"
+
+[[lean_lib]]
+name = "BlockBand"
+globs = ["BlockBand", "BlockBand.+"]
+
+[[lean_lib]]
+name = "BlockBandChallenge"
+srcDir = "Challenge"
+
+[[lean_lib]]
+name = "BlockBandSolution"
+srcDir = "Solution"

@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this paper or its Lean formalization, please cite this work."
+title: "Quantum unique ergodicity and the critical crossover for 1-d Gaussian band matrices"
+type: software
+authors:
+  - family-names: "Ghosal"
+    given-names: "Promit"
+  - family-names: "Remy"
+    given-names: "Guillaume"
+abstract: >-
+  Lean 4 formalization of quantum unique ergodicity for bulk eigenvectors of 1-d complex Gaussian block band
+  matrices when W^2/N tends to infinity, of the unique critical joint law of eigenvalues and eigenvector profiles
+  when N/W^2 tends to tau in (0, infinity), and of its sine and Poisson endpoints.
+keywords:
+  - "random band matrices"
+  - "quantum unique ergodicity"
+  - "localization-delocalization transition"
+  - "Lean 4"
+  - "formalized mathematics"
+repository-code: "https://github.com/AxiomMath/BandMatrixQUE"
+url: "https://github.com/AxiomMath/BandMatrixQUE"
+license: "Apache-2.0"
+version: "1.0.0"
+date-released: "2026-11-11"

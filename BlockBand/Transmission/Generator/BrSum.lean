@@ -1,0 +1,108 @@
+module
+
+public import BlockBand.Transmission.Generator.BrL1
+public import BlockBand.Transmission.Generator.PowSum
+
+/-!
+# Summability of the bracket errors: `PowerBracketSummable`
+
+* `powerBracketSummable_succ hMT hGA hLp hP k l`: the body of `PowerBracketSummable` at
+  `(k+1, l+1)`, along every moving energy. Same summation as `powerDriftSummable_ge2`, with
+  `bracketError_L1` in place of `driftError_pow_L2`:
+  `Σ_r ‖bracketError_r‖₁ ≤ T(K₁/√W + K₂|D₀(E) - D₀(e W)|) → 0`.
+* **`powerBracketSummable_holds hMT hGA hLp hP : PowerBracketSummable`**.
+-/
+
+set_option autoImplicit false
+
+@[expose] public section
+noncomputable section
+
+namespace BlockBand.Transmission.Generator
+
+open MeasureTheory Filter Topology
+open BlockBand.Internal.Contracts.Layers BlockBand.Internal.Contracts.TransmissionPath
+open BlockBand.Internal.Contracts.TransmissionStatements BlockBand.Internal.Contracts.TransmissionUniform
+open BlockBand.Internal.Contracts.Inputs
+open scoped ENNReal
+
+/-- **`PowerBracketSummable` at `(k+1, l+1)`.** -/
+theorem powerBracketSummable_succ (hMT : MatchedTracesContract)
+    (hGA : GaussianAbsorptionContract) (hLp : GaussianLpGradient) (hP : GaussianPoincare)
+    (k l : ℕ) :
+    ∀ b : ℝ, 0 < b → b < 1 / 2 → ∀ E : ℝ, -2 < E → E < 2 →
+      ∀ (Ce : ℝ) (e : ℕ → ℝ), IsMovingEnergy E Ce e → ∀ ε T : ℝ, 0 < ε → ε < T →
+        Tendsto (fun W : ℕ => ∑ r ∈ lengthWindow ε T W,
+          eLpNorm (bracketError b E (e W) W (k + 1) (l + 1) r) 1 (growthPathLaw W b)) atTop
+          (𝓝 0) := by
+  intro b hb0 hb E hE1 hE2 Ce e he ε T hε hεT
+  obtain ⟨hκ, -⟩ := mem_bulk_min hE1 hE2
+  set κI := min (2 + E) (2 - E)
+  obtain ⟨K₁, K₂, W₀, hK₁, hK₂, hL⟩ := bracketError_L1 hMT hGA hLp hP (κ := κI / 2)
+    (ε := ε / 2) (T := T) hb0 hb (by positivity) (by positivity) (by linarith) k l
+  set Δ := fun W : ℕ => |transportD0 b E - transportD0 b (e W)|
+  set U := fun W : ℕ => ENNReal.ofReal (T * (K₁ * (Real.sqrt W)⁻¹ + K₂ * Δ W))
+  have hT0 : 0 < T := by linarith
+  have hU : Tendsto U atTop (𝓝 0) := by
+    have hs : Tendsto (fun W : ℕ => (Real.sqrt W)⁻¹) atTop (𝓝 0) :=
+      (Real.tendsto_sqrt_atTop.comp tendsto_natCast_atTop_atTop).inv_tendsto_atTop
+    have h := ((hs.const_mul K₁).add
+      ((tendsto_transportD0 (b := b) hE1 hE2 he).const_mul K₂)).const_mul T
+    simp only [mul_zero, add_zero] at h
+    simpa [U, Δ] using ENNReal.tendsto_ofReal h
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le' tendsto_const_nhds hU
+    (Eventually.of_forall fun _ => zero_le) ?_
+  filter_upwards [eventually_ge_atTop (max W₀ (max (EnergyUniform.windowWidth κI Ce) ⌈2 / ε⌉₊))]
+    with W hW
+  simp only [max_le_iff] at hW
+  obtain ⟨hW0, hW1, hW2⟩ := hW
+  have hmem := along_mem_bulk hE1 hE2 he hW1
+  have hWε : 2 / ε ≤ (W : ℝ) := le_trans (Nat.le_ceil _) (by exact_mod_cast hW2)
+  have hεW : 2 ≤ ε * W := by rw [div_le_iff₀ hε] at hWε; linarith
+  have hWpos : (0 : ℝ) < W := by nlinarith
+  have hb' : ∀ r ∈ lengthWindow ε T W,
+      eLpNorm (bracketError b E (e W) W (k + 1) (l + 1) r) 1 (growthPathLaw W b)
+      ≤ ENNReal.ofReal (K₁ / Real.sqrt W ^ 3 + K₂ * Δ W / W) := by
+    intro r hr
+    rw [lengthWindow, Finset.mem_Ico] at hr
+    have h1 := Nat.lt_floor_add_one ((W : ℝ) * ε)
+    have h2 : (⌊(W : ℝ) * ε⌋₊ : ℝ) ≤ r := by exact_mod_cast hr.1
+    have hr2 : ε / 2 * W ≤ r := by nlinarith
+    have hr1 : 1 ≤ r := by
+      have : (1 : ℝ) ≤ r := by nlinarith
+      exact_mod_cast this
+    have hr3 : (r : ℝ) ≤ T * W := by
+      have h3 : (r : ℝ) < ⌊(W : ℝ) * T⌋₊ := by exact_mod_cast hr.2
+      have h4 := Nat.floor_le (mul_nonneg hWpos.le hT0.le)
+      linarith
+    exact hL W hW0 (e W) hmem E r hr1 hr2 hr3
+  refine (Finset.sum_le_sum hb').trans ?_
+  rw [Finset.sum_const, nsmul_eq_mul]
+  have hB0 : 0 ≤ K₁ / Real.sqrt W ^ 3 + K₂ * Δ W / W := by
+    have : 0 ≤ Δ W := abs_nonneg _
+    positivity
+  rw [← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul (Nat.cast_nonneg _)]
+  refine ENNReal.ofReal_le_ofReal ?_
+  have hcard : ((lengthWindow ε T W).card : ℝ) ≤ T * W := by
+    rw [lengthWindow, Nat.card_Ico]
+    have h4 := Nat.floor_le (mul_nonneg hWpos.le hT0.le)
+    have : ((⌊(W : ℝ) * T⌋₊ - ⌊(W : ℝ) * ε⌋₊ : ℕ) : ℝ) ≤ (⌊(W : ℝ) * T⌋₊ : ℝ) := by
+      exact_mod_cast Nat.sub_le _ _
+    linarith
+  have hsW : Real.sqrt W ^ 3 = W * Real.sqrt W := by
+    rw [pow_succ, Real.sq_sqrt hWpos.le]
+  have hs0 : 0 < Real.sqrt W := Real.sqrt_pos.mpr hWpos
+  calc ((lengthWindow ε T W).card : ℝ) * (K₁ / Real.sqrt W ^ 3 + K₂ * Δ W / W)
+      ≤ T * W * (K₁ / Real.sqrt W ^ 3 + K₂ * Δ W / W) := mul_le_mul_of_nonneg_right hcard hB0
+    _ = T * (K₁ * (Real.sqrt W)⁻¹ + K₂ * Δ W) := by rw [hsW]; field_simp
+
+/-- **`PowerBracketSummable`**, from the input hypotheses `hMT, hGA, hLp, hP`. -/
+theorem powerBracketSummable_holds (hMT : MatchedTracesContract)
+    (hGA : GaussianAbsorptionContract) (hLp : GaussianLpGradient) (hP : GaussianPoincare) :
+    PowerBracketSummable := by
+  intro b hb0 hb E hE1 hE2 Ce e he k l hk hl ε T hε hεT
+  obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by omega⟩
+  obtain ⟨l', rfl⟩ : ∃ l', l = l' + 1 := ⟨l - 1, by omega⟩
+  exact powerBracketSummable_succ hMT hGA hLp hP k' l' b hb0 hb E hE1 hE2 Ce e he ε T hε hεT
+
+end BlockBand.Transmission.Generator

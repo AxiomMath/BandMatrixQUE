@@ -1,0 +1,15 @@
+{
+  "challenge_module": "BlockBandChallenge",
+  "solution_module": "BlockBandSolution",
+  "theorem_names": [
+    "BlockBand.que",
+    "BlockBand.critical",
+    "BlockBand.endpoints"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Quot.sound",
+    "Classical.choice"
+  ],
+  "enable_nanoda": false
+}
